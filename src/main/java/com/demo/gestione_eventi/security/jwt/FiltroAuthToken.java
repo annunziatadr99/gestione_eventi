@@ -12,16 +12,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class FiltroAuthToken extends OncePerRequestFilter {
 
     @Autowired
-    JwtUtils utils;
+    private JwtUtils utils;
 
     @Autowired
-    UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     private String analizzaJwt(HttpServletRequest request) {
         String headAutenticazione = request.getHeader("Authorization");
@@ -52,3 +54,4 @@ public class FiltroAuthToken extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

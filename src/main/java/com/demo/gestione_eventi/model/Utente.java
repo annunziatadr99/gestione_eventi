@@ -31,7 +31,7 @@ public class Utente {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)  // Cambiato da LAZY a EAGER
     @JoinTable(name = "utente_ruolo",
             joinColumns = @JoinColumn(name = "utente_id"),
             inverseJoinColumns = @JoinColumn(name = "ruolo_id"))

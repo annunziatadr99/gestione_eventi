@@ -29,6 +29,9 @@ public class WebSecurityConfig {
     @Autowired
     AuthEntryPoint gestoreNOAuthorization;
 
+    @Autowired
+    FiltroAuthToken filtroAuthToken;  // Autowire the FiltroAuthToken bean
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,17 +52,15 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // Disabilitiamo CSRF poiché questa applicazione si basa su API RESTful
         http.csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(gestoreNOAuthorization))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/registrazione", "/api/user/login").permitAll()
-                        .requestMatchers("/api/roles/**").permitAll()
                         .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(new FiltroAuthToken(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(filtroAuthToken, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

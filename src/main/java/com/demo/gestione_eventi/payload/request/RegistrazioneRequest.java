@@ -10,7 +10,7 @@ import java.util.Set;
 @Data
 public class RegistrazioneRequest {
     @NotBlank(message = "Username è obbligatorio")
-    @Size(min = 3, max = 15, message = "Username deve essere tra 3 e 15 caratteri")
+    @Size(min = 3, max = 20, message = "Username deve essere tra 3 e 15 caratteri")
     private String username;
 
     @NotBlank(message = "Password è obbligatoria")
