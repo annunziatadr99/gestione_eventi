@@ -6,7 +6,6 @@ import com.demo.gestione_eventi.model.Utente;
 import com.demo.gestione_eventi.repository.EventoRepository;
 import com.demo.gestione_eventi.repository.PrenotazioneRepository;
 import com.demo.gestione_eventi.repository.UtenteRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class EventoService {
 
     @Autowired

@@ -1,14 +1,14 @@
 package com.demo.gestione_eventi.service;
 
+import com.demo.gestione_eventi.enumerated.ERuolo;
 import com.demo.gestione_eventi.exception.EmailDuplicateException;
 import com.demo.gestione_eventi.exception.UsernameDuplicateException;
-import com.demo.gestione_eventi.enumerated.ERuolo;
+
 import com.demo.gestione_eventi.model.Ruolo;
 import com.demo.gestione_eventi.model.Utente;
 import com.demo.gestione_eventi.payload.request.RegistrazioneRequest;
 import com.demo.gestione_eventi.repository.RuoloRepository;
 import com.demo.gestione_eventi.repository.UtenteRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-@Transactional
 public class UtenteService {
 
     @Autowired
@@ -53,16 +52,14 @@ public class UtenteService {
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
-                switch (role) {
-                    case "organizzatore":
-                        Ruolo adminRole = ruoloRepository.findByNome(ERuolo.ROLE_ORGANIZZATORE)
-                                .orElseThrow(() -> new RuntimeException("Errore: Ruolo non trovato."));
-                        roles.add(adminRole);
-                        break;
-                    default:
-                        Ruolo userRole = ruoloRepository.findByNome(ERuolo.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Errore: Ruolo non trovato."));
-                        roles.add(userRole);
+                if (role.equals("ROLE_ORGANIZZATORE")) {
+                    Ruolo organizzatoreRole = ruoloRepository.findByNome(ERuolo.ROLE_ORGANIZZATORE)
+                            .orElseThrow(() -> new RuntimeException("Errore: Ruolo non trovato."));
+                    roles.add(organizzatoreRole);
+                } else {
+                    Ruolo userRole = ruoloRepository.findByNome(ERuolo.ROLE_USER)
+                            .orElseThrow(() -> new RuntimeException("Errore: Ruolo non trovato."));
+                    roles.add(userRole);
                 }
             });
         }
@@ -73,3 +70,4 @@ public class UtenteService {
         return "L'utente " + user.getUsername() + " è stato registrato con successo.";
     }
 }
+

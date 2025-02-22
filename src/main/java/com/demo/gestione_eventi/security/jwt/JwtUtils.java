@@ -36,11 +36,16 @@ public class JwtUtils {
     }
 
     public boolean validazioneJwtToken(String token) {
-        Jwts.parserBuilder().setSigningKey(recuperoChiave()).build().parseClaimsJws(token);
-        return true;
+        try {
+            Jwts.parserBuilder().setSigningKey(recuperoChiave()).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Key recuperoChiave() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 }
+

@@ -9,22 +9,28 @@ import java.util.Set;
 
 @Data
 public class RegistrazioneRequest {
-
-    @NotBlank
-    @Size(min = 3, max = 15)
+    @NotBlank(message = "Username è obbligatorio")
+    @Size(min = 3, max = 15, message = "Username deve essere tra 3 e 15 caratteri")
     private String username;
 
-    @NotBlank
-    @Size(min = 3, max = 20)
+    @NotBlank(message = "Password è obbligatoria")
+    @Size(min = 6, message = "Password deve essere almeno 6 caratteri")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "Cognome è obbligatorio")
     private String cognome;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email è obbligatoria")
+    @Email(message = "Email non valida")
     private String email;
 
+    private boolean isOrganizzatore = false;
+
     private Set<String> ruoli;
+
+    public Set<String> getRuoli() {
+        return ruoli;
+    }
 }
+
 

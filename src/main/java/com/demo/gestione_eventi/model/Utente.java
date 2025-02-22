@@ -20,8 +20,6 @@ public class Utente {
     private Long id;
 
     private String nome;
-
-    @Column(nullable = false)
     private String cognome;
 
     @Column(nullable = false, unique = true)
@@ -33,9 +31,10 @@ public class Utente {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "utente_ruolo",
             joinColumns = @JoinColumn(name = "utente_id"),
             inverseJoinColumns = @JoinColumn(name = "ruolo_id"))
     private Set<Ruolo> ruoli = new HashSet<>();
 }
+

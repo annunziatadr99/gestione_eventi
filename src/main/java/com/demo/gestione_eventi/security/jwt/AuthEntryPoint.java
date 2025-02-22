@@ -31,3 +31,4 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
         mappaturaErrori.writeValue(response.getOutputStream(), infoErrori);
     }
 }
+
