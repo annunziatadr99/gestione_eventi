@@ -30,7 +30,7 @@ public class WebSecurityConfig {
     AuthEntryPoint gestoreNOAuthorization;
 
     @Autowired
-    FiltroAuthToken filtroAuthToken;  // Autowire the FiltroAuthToken bean
+    FiltroAuthToken filtroAuthToken;
 
     @Bean
     public PasswordEncoder passwordEncoder() {

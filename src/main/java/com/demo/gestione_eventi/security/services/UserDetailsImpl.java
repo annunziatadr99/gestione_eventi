@@ -1,40 +1,50 @@
 package com.demo.gestione_eventi.security.services;
 
 import com.demo.gestione_eventi.model.Utente;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
-@AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-    private Long id;
-    private String username;
-    private String email;
+    private final Long id;
+    private final String username;
+    private final String email;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
 
-    @JsonIgnore
-    private String password;
+    public UserDetailsImpl(Long id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.authorities = authorities;
+    }
 
-    private Collection<? extends GrantedAuthority> ruoli;
-
-    public static UserDetailsImpl costruisciDettagli(Utente user) {
-        List<GrantedAuthority> ruoliUtente = user.getRuoli().stream()
-                .map(ruolo -> new SimpleGrantedAuthority(ruolo.getNome().name()))
+    public static UserDetailsImpl costruisciDettagli(Utente utente) {
+        List<GrantedAuthority> authorities = utente.getRuoli().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getNome().name()))
                 .collect(Collectors.toList());
 
-        return new UserDetailsImpl(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), ruoliUtente);
+        return new UserDetailsImpl(
+                utente.getId(),
+                utente.getUsername(),
+                utente.getEmail(),
+                utente.getPassword(),
+                authorities);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return ruoli;
+        return authorities;
     }
 
     @Override
@@ -45,6 +55,10 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Override

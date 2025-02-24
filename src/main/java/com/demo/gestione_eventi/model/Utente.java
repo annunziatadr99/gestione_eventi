@@ -37,4 +37,3 @@ public class Utente {
             inverseJoinColumns = @JoinColumn(name = "ruolo_id"))
     private Set<Ruolo> ruoli = new HashSet<>();
 }
-

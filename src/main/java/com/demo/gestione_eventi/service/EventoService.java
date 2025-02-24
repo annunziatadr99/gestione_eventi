@@ -6,6 +6,7 @@ import com.demo.gestione_eventi.model.Utente;
 import com.demo.gestione_eventi.repository.EventoRepository;
 import com.demo.gestione_eventi.repository.PrenotazioneRepository;
 import com.demo.gestione_eventi.repository.UtenteRepository;
+import com.demo.gestione_eventi.payload.request.EventoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +20,20 @@ public class EventoService {
     EventoRepository eventoRepository;
 
     @Autowired
-    PrenotazioneRepository prenotazioneRepository;
-
-    @Autowired
     UtenteRepository utenteRepository;
 
-    public Evento creaEvento(Evento evento, Long creatoreId) {
+    @Autowired
+    PrenotazioneRepository prenotazioneRepository;
+
+    public Evento creaEvento(EventoRequest eventoRequest, Long creatoreId) {
         Optional<Utente> creatore = utenteRepository.findById(creatoreId);
         if (creatore.isPresent()) {
+            Evento evento = new Evento();
+            evento.setTitolo(eventoRequest.getTitolo());
+            evento.setDescrizione(eventoRequest.getDescrizione());
+            evento.setData(eventoRequest.getData());
+            evento.setLuogo(eventoRequest.getLuogo());
+            evento.setPostiDisponibili(eventoRequest.getPostiDisponibili());
             evento.setCreatore(creatore.get());
             return eventoRepository.save(evento);
         } else {
@@ -34,60 +41,64 @@ public class EventoService {
         }
     }
 
-    public Evento modificaEvento(Long eventoId, Evento eventoDetails) {
-        Evento evento = eventoRepository.findById(eventoId).orElseThrow(() -> new RuntimeException("Evento non trovato"));
+    public Evento modificaEvento(Long id, Evento eventoDetails) {
+        Evento evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evento non trovato"));
+
         evento.setTitolo(eventoDetails.getTitolo());
         evento.setDescrizione(eventoDetails.getDescrizione());
         evento.setData(eventoDetails.getData());
         evento.setLuogo(eventoDetails.getLuogo());
         evento.setPostiDisponibili(eventoDetails.getPostiDisponibili());
+
         return eventoRepository.save(evento);
     }
 
-    public void eliminaEvento(Long eventoId) {
-        Evento evento = eventoRepository.findById(eventoId).orElseThrow(() -> new RuntimeException("Evento non trovato"));
-        eventoRepository.delete(evento);
-    }
+    public void eliminaEvento(Long id) {
+        Evento evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evento non trovato"));
 
-    public List<Evento> trovaEventiPerCreatore(Long creatoreId) {
-        return eventoRepository.findByCreatoreId(creatoreId);
+        eventoRepository.delete(evento);
     }
 
     public List<Evento> trovaTuttiEventi() {
         return eventoRepository.findAll();
     }
 
-    public Optional<Evento> trovaEventoPerId(Long eventoId) {
-        return eventoRepository.findById(eventoId);
+    public List<Evento> trovaEventiPerCreatore(Long creatoreId) {
+        return eventoRepository.findByCreatoreId(creatoreId);
     }
 
-    public void prenotaPosto(Long eventoId, Long utenteId, int postiPrenotati) {
-        Evento evento = eventoRepository.findById(eventoId).orElseThrow(() -> new RuntimeException("Evento non trovato"));
-        Utente utente = utenteRepository.findById(utenteId).orElseThrow(() -> new RuntimeException("Utente non trovato"));
+    public Evento prenotaPosto(Long eventoId, Long utenteId, int postiPrenotati) {
+        Evento evento = eventoRepository.findById(eventoId)
+                .orElseThrow(() -> new RuntimeException("Evento non trovato"));
 
-        if (evento.getPostiDisponibili() >= postiPrenotati) {
-            evento.setPostiDisponibili(evento.getPostiDisponibili() - postiPrenotati);
-            eventoRepository.save(evento);
-
-            Prenotazione prenotazione = new Prenotazione();
-            prenotazione.setUtente(utente);
-            prenotazione.setEvento(evento);
-            prenotazione.setPostiPrenotati(postiPrenotati);
-
-            prenotazioneRepository.save(prenotazione);
-        } else {
-            throw new RuntimeException("Posti esauriti");
+        if (evento.getPostiDisponibili() < postiPrenotati) {
+            throw new RuntimeException("Posti insufficienti");
         }
+
+        Utente utente = utenteRepository.findById(utenteId)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        Prenotazione prenotazione = new Prenotazione();
+        prenotazione.setEvento(evento);
+        prenotazione.setUtente(utente);
+        prenotazione.setPostiPrenotati(postiPrenotati);
+
+        prenotazioneRepository.save(prenotazione);
+
+        evento.setPostiDisponibili(evento.getPostiDisponibili() - postiPrenotati);
+        return eventoRepository.save(evento);
     }
 
-    public void cancellaPrenotazione(Long eventoId, Long utenteId) {
-        Evento evento = eventoRepository.findById(eventoId).orElseThrow(() -> new RuntimeException("Evento non trovato"));
+    public Evento cancellaPrenotazione(Long eventoId, Long utenteId) {
         Prenotazione prenotazione = prenotazioneRepository.findByEventoIdAndUtenteId(eventoId, utenteId)
                 .orElseThrow(() -> new RuntimeException("Prenotazione non trovata"));
 
+        Evento evento = prenotazione.getEvento();
         evento.setPostiDisponibili(evento.getPostiDisponibili() + prenotazione.getPostiPrenotati());
-        eventoRepository.save(evento);
 
         prenotazioneRepository.delete(prenotazione);
+        return eventoRepository.save(evento);
     }
 }

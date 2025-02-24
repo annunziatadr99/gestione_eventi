@@ -80,4 +80,6 @@ public class UtenteController {
         return ResponseEntity.ok(new JwtResponse(userDetails.getUsername(), userDetails.getId(),
                 userDetails.getEmail(), ruoli, jwt));
     }
+
+
 }

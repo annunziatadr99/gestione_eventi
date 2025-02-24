@@ -3,7 +3,6 @@ package com.demo.gestione_eventi.service;
 import com.demo.gestione_eventi.enumerated.ERuolo;
 import com.demo.gestione_eventi.exception.EmailDuplicateException;
 import com.demo.gestione_eventi.exception.UsernameDuplicateException;
-
 import com.demo.gestione_eventi.model.Ruolo;
 import com.demo.gestione_eventi.model.Utente;
 import com.demo.gestione_eventi.payload.request.RegistrazioneRequest;
@@ -40,6 +39,7 @@ public class UtenteService {
         Utente user = new Utente();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setNome(dto.getNome());
         user.setCognome(dto.getCognome());
         user.setEmail(dto.getEmail());
 
@@ -70,4 +70,3 @@ public class UtenteService {
         return "L'utente " + user.getUsername() + " è stato registrato con successo.";
     }
 }
-

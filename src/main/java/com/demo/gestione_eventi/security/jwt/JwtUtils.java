@@ -1,9 +1,7 @@
 package com.demo.gestione_eventi.security.jwt;
 
 import com.demo.gestione_eventi.security.services.UserDetailsImpl;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -39,13 +37,12 @@ public class JwtUtils {
         try {
             Jwts.parserBuilder().setSigningKey(recuperoChiave()).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException e) {
             return false;
         }
     }
 
     private Key recuperoChiave() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 }
-

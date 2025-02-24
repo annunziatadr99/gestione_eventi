@@ -1,11 +1,15 @@
 package com.demo.gestione_eventi.controller;
 
 import com.demo.gestione_eventi.model.Evento;
+import com.demo.gestione_eventi.payload.request.EventoRequest;
+import com.demo.gestione_eventi.security.services.UserDetailsImpl;
 import com.demo.gestione_eventi.service.EventoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +23,12 @@ public class EventoController {
     EventoService eventoService;
 
     @PostMapping("/crea")
-    @PreAuthorize("hasRole('ROLE_ORGANIZZATORE')")
-    public ResponseEntity<Evento> creaEvento(@Validated @RequestBody Evento evento, @RequestParam Long creatoreId) {
-        Evento nuovoEvento = eventoService.creaEvento(evento, creatoreId);
+    public ResponseEntity<Evento> creaEvento(@RequestBody EventoRequest eventoRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long creatoreId = userDetails.getId();
+
+        Evento nuovoEvento = eventoService.creaEvento(eventoRequest, creatoreId);
         return new ResponseEntity<>(nuovoEvento, HttpStatus.CREATED);
     }
 
@@ -51,17 +58,25 @@ public class EventoController {
         return new ResponseEntity<>(eventi, HttpStatus.OK);
     }
 
-    @PostMapping("/prenota/{id}")
+    @PostMapping("/{eventoId}/prenota")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> prenotaPosto(@PathVariable Long id, @RequestParam Long utenteId, @RequestParam int postiPrenotati) {
-        eventoService.prenotaPosto(id, utenteId, postiPrenotati);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Evento> prenotaPosto(@PathVariable Long eventoId, @RequestParam int postiPrenotati) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long utenteId = userDetails.getId();
+
+        Evento evento = eventoService.prenotaPosto(eventoId, utenteId, postiPrenotati);
+        return new ResponseEntity<>(evento, HttpStatus.OK);
     }
 
-    @DeleteMapping("/cancellaPrenotazione/{id}")
+    @DeleteMapping("/{eventoId}/cancellaPrenotazione")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> cancellaPrenotazione(@PathVariable Long id, @RequestParam Long utenteId) {
-        eventoService.cancellaPrenotazione(id, utenteId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Evento> cancellaPrenotazione(@PathVariable Long eventoId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long utenteId = userDetails.getId();
+
+        Evento evento = eventoService.cancellaPrenotazione(eventoId, utenteId);
+        return new ResponseEntity<>(evento, HttpStatus.OK);
     }
 }

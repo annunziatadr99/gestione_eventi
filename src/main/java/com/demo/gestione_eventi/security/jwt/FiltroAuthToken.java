@@ -54,4 +54,3 @@ public class FiltroAuthToken extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

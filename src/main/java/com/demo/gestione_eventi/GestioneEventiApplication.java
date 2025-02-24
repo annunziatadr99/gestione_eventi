@@ -1,6 +1,5 @@
 package com.demo.gestione_eventi;
 
-
 import com.demo.gestione_eventi.enumerated.ERuolo;
 import com.demo.gestione_eventi.model.Ruolo;
 import com.demo.gestione_eventi.repository.RuoloRepository;
@@ -34,4 +33,3 @@ public class GestioneEventiApplication implements CommandLineRunner {
 		}
 	}
 }
-
