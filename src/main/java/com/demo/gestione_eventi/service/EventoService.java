@@ -9,7 +9,6 @@ import com.demo.gestione_eventi.repository.UtenteRepository;
 import com.demo.gestione_eventi.payload.request.EventoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
